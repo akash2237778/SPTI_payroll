@@ -1,0 +1,111 @@
+services:
+  db:
+    image: postgres:15
+    container_name: spti_db
+    environment:
+      POSTGRES_DB: spti_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - spti_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: spti_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - spti_network
+    restart: unless-stopped
+    
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: spti_kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      - spti_network
+    depends_on:
+      - zookeeper
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    
+  backend:
+    image: akash7778/sptipayroll-backend:latest
+    container_name: spti_backend
+    command: bash -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 --reload spti_payroll.wsgi:application"
+    ports:
+      - "8001:8000"
+    networks:
+      - spti_network
+    environment:
+      DB_ENGINE: django.db.backends.postgresql
+      POSTGRES_DB: spti_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST: db
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      DJANGO_DEBUG: "True"
+      ALLOWED_HOSTS: "*"
+      PYTHONUNBUFFERED: "1"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+    
+  consumer:
+    image: akash7778/sptipayroll-consumer:latest
+    container_name: spti_consumer
+    command: python manage.py run_kafka_consumer
+    networks:
+      spti_network:
+      macvlan_network:
+        ipv4_address: 192.168.2.200  # CHANGE THIS to an unused IP on your network
+    environment:
+      DB_ENGINE: django.db.backends.postgresql
+      POSTGRES_DB: spti_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST: db
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      PYTHONUNBUFFERED: "1"
+    restart: unless-stopped
+
+networks:
+  spti_network:
+    driver: bridge
+    
+  macvlan_network:
+    driver: macvlan
+    driver_opts:
+      parent: enp0s31f6  # CHANGE THIS to your TrueNAS network interface (e.g., eno1, enp0s3, br0)
+    ipam:
+      config:
+        - subnet: 192.168.2.0/24      # CHANGE THIS to your network subnet
+          gateway: 192.168.2.55         # CHANGE THIS to your router IP
+          ip_range: 192.168.2.200/32   # CHANGE THIS to match the consumer IP above
+
+volumes:
+  postgres_data:

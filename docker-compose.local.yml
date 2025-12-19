@@ -1,0 +1,98 @@
+services:
+  db:
+    image: postgres:15
+    container_name: spti_db
+    environment:
+      POSTGRES_DB: spti_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"  # Expose for local development
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: spti_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: spti_kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092  # Changed for local access
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build: .
+    container_name: spti_backend
+    command: bash -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 --reload spti_payroll.wsgi:application"
+    ports:
+      - "9000:8000"
+    environment:
+      DB_ENGINE: django.db.backends.postgresql
+      POSTGRES_DB: spti_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST: db
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      DJANGO_DEBUG: "True"
+      ALLOWED_HOSTS: "*"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Consumer commented out - run locally for development
+  # consumer:
+  #   build: .
+  #   container_name: spti_consumer
+  #   command: python manage.py run_kafka_consumer
+  #   environment:
+  #     DB_ENGINE: django.db.backends.postgresql
+  #     POSTGRES_DB: spti_db
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_HOST: db
+  #     KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  #     PYTHONUNBUFFERED: "1"
+  #   volumes:
+  #     - type: bind
+  #       source: .
+  #       target: /app
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #     kafka:
+  #       condition: service_healthy
+  #   restart: unless-stopped

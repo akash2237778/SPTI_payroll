@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            <div class="logo-text">SPTI Payroll</div>
+        </div>
+
+        <nav style="display: flex; flex-direction: column; gap: 1rem;">
+            <a href="{% url 'dashboard' %}" style="text-decoration: none;">
+                <div style="padding: 1rem; color: var(--text-secondary); cursor: pointer; transition: 0.3s;"
+                    onmouseover="this.style.color='white'" onmouseout="this.style.color='#9ca3af'">
+                    📊 Dashboard
+                </div>
+            </a>
+            <a href="{% url 'monthly_report' %}" style="text-decoration: none;">
+                <div style="padding: 1rem; color: var(--text-secondary); cursor: pointer; transition: 0.3s;"
+                    onmouseover="this.style.color='white'" onmouseout="this.style.color='#9ca3af'">
+                    📅 Monthly Report
+                </div>
+            </a>
+            <div
+                style="background: rgba(139, 92, 246, 0.1); color: #c4b5fd; padding: 1rem; border-radius: 12px; font-weight: 500; border: 1px solid rgba(139, 92, 246, 0.2); cursor: pointer;">
+                ⚙️ Settings
+            </div>
+        </nav>
+
+        <div style="margin-top: auto; padding-top: 2rem; color: var(--text-secondary); font-size: 0.8rem;">
+            <div>System Status: <span style="color: #34d399">● Online</span></div>
+            <div style="margin-top: 0.5rem;">v1.2.0 Settings</div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+        <div class="sync-section">
+            <div>
+                <h1 style="margin: 0; font-size: 2rem; font-weight: 700;">Work Settings</h1>
+                <p style="color: var(--text-secondary); margin-top: 0.5rem;">Configure working hours and lunch breaks
+                </p>
+            </div>
+        </div>
+
+        <!-- Global Settings Card -->
+        <div class="table-wrapper" style="margin-bottom: 2rem;">
+            <div class="table-header">
+                <h2 class="table-title">⚙️ Global Settings</h2>
+            </div>
+            <div style="padding: 2rem;">
+                <form id="globalSettingsForm" onsubmit="saveGlobalSettings(event)">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                        <div>
+                            <label
+                                style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">
+                                Default Working Hours per Day
+                            </label>
+                            <input type="number" step="0.5" min="1" max="24" name="default_working_hours"
+                                value="{{ settings.default_working_hours }}"
+                                style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 1rem;">
+                        </div>
+
+                        <div>
+                            <label
+                                style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">
+                                Lunch Start Time
+                            </label>
+                            <input type="time" name="lunch_start_time"
+                                value="{{ settings.lunch_start_time|time:'H:i' }}"
+                                style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 1rem;">
+                        </div>
+
+                        <div>
+                            <label
+                                style="display: block; color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">
+                                Lunch End Time
+                            </label>
+                            <input type="time" name="lunch_end_time" value="{{ settings.lunch_end_time|time:'H:i' }}"
+                                style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 1rem;">
+                        </div>
+
+                        <div>
+                            <label
+                                style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; margin-top: 1.8rem;">
+                                <input type="checkbox" name="exclude_lunch_from_hours" {% if settings.exclude_lunch_from_hours %}checked{% endif %}
+                                    style="width: 20px; height: 20px; cursor: pointer;">
+                                <span style="color: white; font-size: 0.95rem;">Exclude lunch from working hours</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                        <button type="submit" class="btn-glow">
+                            💾 Save Global Settings
+                        </button>
+                        <div id="globalSettingsMessage"
+                            style="display: flex; align-items: center; color: #34d399; font-size: 0.9rem;"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Employee-Specific Settings -->
+        <div class="table-wrapper">
+            <div class="table-header">
+                <h2 class="table-title">👥 Employee Working Hours</h2>
+                <div style="color: var(--text-secondary); font-size: 0.85rem;">
+                    Leave blank to use default ({{ settings.default_working_hours }}h)
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Employee ID</th>
+                        <th>Custom Working Hours</th>
+                        <th>Current (Effective)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in employees %}
+                    <tr>
+                        <td style="font-weight: 500; color: white;">
+                            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                <div
+                                    style="width: 32px; height: 32px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
+                                    {{ emp.name|make_list|first }}
+                                </div>
+                                {{ emp.name }}
+                            </div>
+                        </td>
+                        <td style="color: var(--text-secondary);">{{ emp.employee_id }}</td>
+                        <td>
+                            <input type="number" step="0.5" min="1" max="24" id="hours_{{ emp.id }}"
+                                value="{{ emp.working_hours|default:'' }}" placeholder="Use default"
+                                style="width: 120px; padding: 0.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: white;">
+                        </td>
+                        <td style="font-family: 'Space Grotesk'; color: #c4b5fd; font-weight: 600;">
+                            {{ emp.get_working_hours }}h
+                            {% if not emp.working_hours %}
+                            <span
+                                style="font-size: 0.7rem; color: var(--text-secondary); font-weight: normal;">(default)</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button onclick="updateEmployeeHours({{ emp.id }})"
+                                style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: 0.2s;"
+                                onmouseover="this.style.background='#7c3aed'"
+                                onmouseout="this.style.background='var(--primary)'">
+                                Update
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<script>
+    function saveGlobalSettings(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        const messageDiv = document.getElementById('globalSettingsMessage');
+
+        fetch('{% url "settings" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    messageDiv.textContent = '✓ ' + data.message;
+                    messageDiv.style.color = '#34d399';
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    messageDiv.textContent = '✗ ' + data.message;
+                    messageDiv.style.color = '#f87171';
+                }
+            })
+            .catch(error => {
+                messageDiv.textContent = '✗ Error saving settings';
+                messageDiv.style.color = '#f87171';
+                console.error('Error:', error);
+            });
+    }
+
+    function updateEmployeeHours(employeeId) {
+        const input = document.getElementById(`hours_${employeeId}`);
+        const formData = new FormData();
+        formData.append('working_hours', input.value);
+
+        fetch(`/api/employee/${employeeId}/update-hours/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('✓ ' + data.message);
+                    location.reload();
+                } else {
+                    alert('✗ ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('✗ Error updating hours');
+                console.error('Error:', error);
+            });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

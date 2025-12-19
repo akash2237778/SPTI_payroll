@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <!-- Sidebar (Shared) -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            <div class="logo-text">SPTI Payroll</div>
+        </div>
+
+        <nav style="display: flex; flex-direction: column; gap: 1rem;">
+            <a href="{% url 'dashboard' %}" style="text-decoration: none;">
+                <div style="padding: 1rem; color: var(--text-secondary); cursor: pointer; transition: 0.3s;"
+                    onmouseover="this.style.color='white'" onmouseout="this.style.color='#9ca3af'">
+                    📊 Dashboard
+                </div>
+            </a>
+            <div
+                style="background: rgba(139, 92, 246, 0.1); color: #c4b5fd; padding: 1rem; border-radius: 12px; font-weight: 500; border: 1px solid rgba(139, 92, 246, 0.2); cursor: pointer;">
+                📅 Monthly Report
+            </div>
+            <!--
+            <div style="padding: 1rem; color: var(--text-secondary); cursor: pointer; transition: 0.3s;">
+                👥 Employees
+            </div>
+            -->
+        </nav>
+
+        <div style="margin-top: auto; padding-top: 2rem; color: var(--text-secondary); font-size: 0.8rem;">
+            <div>System Status: <span style="color: #34d399">● Online</span></div>
+            <div style="margin-top: 0.5rem;">v1.1.0 Report</div>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+        <div class="sync-section">
+            <div>
+                <h1 style="margin: 0; font-size: 2rem; font-weight: 700;">Monthly Report</h1>
+                <p style="color: var(--text-secondary); margin-top: 0.5rem;">{{ month_name }} {{ year }}</p>
+            </div>
+            <div>
+                <a href="?month={{ prev_month }}&year={{ prev_year }}" class="btn-glow"
+                    style="padding: 0.5rem 1rem; font-size: 0.9rem; text-decoration: none; display: inline-flex;">←
+                    Prev</a>
+                <span style="color: var(--text-primary); margin: 0 1rem; font-weight: 600;">
+                    {{ month_name }} {{ year }}
+                </span>
+                <a href="?month={{ next_month }}&year={{ next_year }}" class="btn-glow"
+                    style="padding: 0.5rem 1rem; font-size: 0.9rem; text-decoration: none; display: inline-flex;">Next
+                    →</a>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <div class="table-header">
+                <h2 class="table-title">Employee Attendance Summary</h2>
+                <button
+                    style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-weight: 600;">Export
+                    CSV</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Days Present</th>
+                        <th>Total Hours</th>
+                        <th>Overtime Hours</th>
+                        <th>Avg Hrs/Day</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report_data %}
+                    <tr style="cursor: pointer; transition: all 0.2s ease;"
+                        onclick="window.location.href='{% url 'employee_daily_report' row.employee.id %}?month={{ month }}&year={{ year }}'"
+                        onmouseover="this.style.background='rgba(139, 92, 246, 0.05)'"
+                        onmouseout="this.style.background='transparent'">
+                        <td style="font-weight: 500; color: white;">
+                            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                <div
+                                    style="width: 32px; height: 32px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
+                                    {{ row.employee.name|make_list|first }}
+                                </div>
+                                <div>
+                                    <div style="line-height: 1;">{{ row.employee.name }}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">ID:
+                                        {{ row.employee.employee_id }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-family: 'Space Grotesk'; font-size: 1.1rem;">
+                            {{ row.days_present }}
+                        </td>
+                        <td style="font-family: 'Space Grotesk'; color: #c4b5fd;">
+                            {{ row.total_hours }} hrs
+                        </td>
+                        <td
+                            style="font-family: 'Space Grotesk'; color: {% if row.overtime_hours > 0 %}#fccb00{% else %}var(--text-secondary){% endif %};">
+                            {{ row.overtime_hours }} hrs
+                        </td>
+                        <td style="font-family: 'Space Grotesk'; color: var(--text-secondary);">
+                            {{ row.avg_hours }} hrs
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                            No attendance data found for this month.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}
