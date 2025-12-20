@@ -51,7 +51,7 @@ services:
     restart: unless-stopped
     
   backend:
-    image: akash7778/sptipayroll-backend:latest
+    image: akash7778/sptipayroll-backend:0.1
     container_name: spti_backend
     command: bash -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 --reload spti_payroll.wsgi:application"
     ports:
@@ -76,7 +76,7 @@ services:
     restart: unless-stopped
     
   consumer:
-    image: akash7778/sptipayroll-consumer:latest
+    image: akash7778/sptipayroll-consumer:0.1
     container_name: spti_consumer
     command: python manage.py run_kafka_consumer
     networks:

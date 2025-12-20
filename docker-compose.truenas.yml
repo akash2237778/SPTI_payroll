@@ -45,7 +45,7 @@ services:
     restart: unless-stopped
     
   backend:
-    image: akash7778/sptipayroll-backend:latest
+    image: akash7778/sptipayroll-backend:0.1
     container_name: spti_backend
     command: bash -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 --reload spti_payroll.wsgi:application"
     ports:
@@ -68,18 +68,22 @@ services:
     restart: unless-stopped
     
   consumer:
-    image: akash7778/sptipayroll-consumer:latest
+    image: akash7778/sptipayroll-consumer:0.1
     container_name: spti_consumer
     command: python manage.py run_kafka_consumer
-    network_mode: "host"
     environment:
       DB_ENGINE: django.db.backends.postgresql
       POSTGRES_DB: spti_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_HOST: localhost
-      KAFKA_BOOTSTRAP_SERVERS: localhost:9092
+      POSTGRES_HOST: db
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       PYTHONUNBUFFERED: "1"
+    depends_on:
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:

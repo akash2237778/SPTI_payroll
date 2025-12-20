@@ -75,7 +75,6 @@ services:
     build: .
     container_name: spti_consumer
     command: python manage.py run_kafka_consumer
-    network_mode: "bridge"  # Use bridge network (default)
     environment:
       DB_ENGINE: django.db.backends.postgresql
       POSTGRES_DB: spti_db

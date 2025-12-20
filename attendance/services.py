@@ -317,7 +317,7 @@ class BiometricService:
                 night_allowance_amount = 0.0
                 if shift and shift.night_shift_allowance > 0 and night_hours > 0:
                     # Allowance is percentage of night hours
-                    night_allowance_amount = (night_hours * shift.night_shift_allowance) / 100.0
+                    night_allowance_amount = (night_hours * float(shift.night_shift_allowance)) / 100.0
                 
                 # Update or create summary
                 DailySummary.objects.update_or_create(
