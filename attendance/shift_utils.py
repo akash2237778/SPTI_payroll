@@ -113,6 +113,12 @@ def calculate_night_hours(check_in, check_out, night_start_time, night_end_time)
     if check_out <= check_in:
         return 0.0, 0.0
     
+    # Convert string times to time objects if needed
+    if isinstance(night_start_time, str):
+        night_start_time = datetime.strptime(night_start_time, '%H:%M:%S').time()
+    if isinstance(night_end_time, str):
+        night_end_time = datetime.strptime(night_end_time, '%H:%M:%S').time()
+    
     # Convert night times to datetime for the relevant dates
     check_in_date = check_in.date()
     check_out_date = check_out.date()

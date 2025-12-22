@@ -10,7 +10,7 @@ def set_default_working_hours(apps, schema_editor):
     
     # Update all employees without working hours to 8.0
     employees_updated = Employee.objects.filter(working_hours__isnull=True).update(working_hours=8.0)
-    print(f"✓ Set working_hours=8.0 for {employees_updated} employees")
+    print(f"[OK] Set working_hours=8.0 for {employees_updated} employees")
 
 
 def clean_old_data(apps, schema_editor):
@@ -22,11 +22,11 @@ def clean_old_data(apps, schema_editor):
     
     # Delete old attendance logs
     old_logs_count, _ = AttendanceLog.objects.filter(timestamp__date__lt=cutoff_date).delete()
-    print(f"✓ Deleted {old_logs_count} attendance logs before {cutoff_date}")
+    print(f"[OK] Deleted {old_logs_count} attendance logs before {cutoff_date}")
     
     # Delete old daily summaries
     old_summaries_count, _ = DailySummary.objects.filter(date__lt=cutoff_date).delete()
-    print(f"✓ Deleted {old_summaries_count} daily summaries before {cutoff_date}")
+    print(f"[OK] Deleted {old_summaries_count} daily summaries before {cutoff_date}")
 
 
 def reverse_working_hours(apps, schema_editor):

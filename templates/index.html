@@ -20,10 +20,24 @@
                     📅 Monthly Report
                 </div>
             </a>
-            <div style="padding: 1rem; color: var(--text-secondary); cursor: pointer; transition: 0.3s;"
-                onmouseover="this.style.color='white'" onmouseout="this.style.color='#9ca3af'">
-                ⚙️ Settings
-            </div>
+            <a href="{% url 'manage_attendance_logs' %}" style="text-decoration: none;">
+                <div style="padding: 1rem; color: var(--text-secondary); cursor: pointer; transition: 0.3s;"
+                    onmouseover="this.style.color='white'" onmouseout="this.style.color='#9ca3af'">
+                    📋 Manage Logs
+                </div>
+            </a>
+            <a href="{% url 'shifts' %}" style="text-decoration: none;">
+                <div style="padding: 1rem; color: var(--text-secondary); cursor: pointer; transition: 0.3s;"
+                    onmouseover="this.style.color='white'" onmouseout="this.style.color='#9ca3af'">
+                    🕐 Shifts
+                </div>
+            </a>
+            <a href="{% url 'settings' %}" style="text-decoration: none;">
+                <div style="padding: 1rem; color: var(--text-secondary); cursor: pointer; transition: 0.3s;"
+                    onmouseover="this.style.color='white'" onmouseout="this.style.color='#9ca3af'">
+                    ⚙️ Settings
+                </div>
+            </a>
         </nav>
 
         <div style="margin-top: auto; padding-top: 2rem; color: var(--text-secondary); font-size: 0.8rem;">
