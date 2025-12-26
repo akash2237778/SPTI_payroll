@@ -34,8 +34,10 @@ def run_consumer():
 
     # Initial Sync on Startup
     try:
-        print(f"Attempting initial sync with {settings.ZK_DEVICE_IP}...")
-        service.sync_device(settings.ZK_DEVICE_IP)
+        from .models import DeviceSettings
+        device_settings = DeviceSettings.get_settings()
+        print(f"Attempting initial sync with {device_settings.device_ip}:{device_settings.device_port}...")
+        service.sync_device()  # Will use DeviceSettings automatically
         print("Initial startup sync completed successfully.")
     except Exception as e:
         print(f"Initial startup sync failed: {e}")

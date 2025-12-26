@@ -137,6 +137,60 @@ class WorkSettings(models.Model):
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
 
+class DeviceSettings(models.Model):
+    """
+    Biometric device connection settings (singleton model)
+    """
+    device_ip = models.CharField(
+        max_length=15,
+        default='192.168.2.66',
+        help_text="IP address of the ZK biometric device"
+    )
+    device_port = models.IntegerField(
+        default=4370,
+        help_text="Port number for device connection"
+    )
+    timeout = models.IntegerField(
+        default=60,
+        help_text="Connection timeout in seconds"
+    )
+    password = models.IntegerField(
+        default=0,
+        help_text="Device password (usually 0)"
+    )
+    force_udp = models.BooleanField(
+        default=True,
+        help_text="Force UDP connection"
+    )
+    ommit_ping = models.BooleanField(
+        default=True,
+        help_text="Skip initial ping check"
+    )
+    
+    class Meta:
+        verbose_name = "Device Settings"
+        verbose_name_plural = "Device Settings"
+    
+    def __str__(self):
+        return f"Device Settings ({self.device_ip}:{self.device_port})"
+    
+    def save(self, *args, **kwargs):
+        # Ensure only one instance exists (singleton)
+        self.pk = 1
+        super().save(*args, **kwargs)
+    
+    @classmethod
+    def get_settings(cls):
+        """Get or create the singleton settings instance"""
+        from django.conf import settings as django_settings
+        obj, created = cls.objects.get_or_create(
+            pk=1,
+            defaults={
+                'device_ip': django_settings.ZK_DEVICE_IP,
+            }
+        )
+        return obj
+
 class Employee(models.Model):
     name = models.CharField(max_length=100)
     employee_id = models.CharField(max_length=50, unique=True, help_text="Internal Company ID")

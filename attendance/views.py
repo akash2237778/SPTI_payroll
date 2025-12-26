@@ -42,7 +42,9 @@ def trigger_sync_view(request):
     """
     Producer: Pushes a sync task to Kafka.
     """
-    device_ip = request.GET.get('ip', settings.ZK_DEVICE_IP)
+    from .models import DeviceSettings
+    device_settings = DeviceSettings.get_settings()
+    device_ip = request.GET.get('ip', device_settings.device_ip)
     
     try:
         producer = KafkaProducer(

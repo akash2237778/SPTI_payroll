@@ -15,15 +15,14 @@ class Command(BaseCommand):
         self.print_stats("PRE-SYNC")
 
         # 2. Run Sync
-        ip = getattr(settings, 'ZK_DEVICE_IP', None)
-        if not ip:
-            self.stdout.write(self.style.ERROR("ZK_DEVICE_IP not found in settings"))
-            return
+        from attendance.models import DeviceSettings
+        device_settings = DeviceSettings.get_settings()
+        ip = device_settings.device_ip
 
         self.stdout.write(self.style.SUCCESS(f"Starting Sync with {ip}..."))
         try:
             service = BiometricService()
-            service.sync_device(ip)
+            service.sync_device()  # Will use DeviceSettings automatically
             self.stdout.write(self.style.SUCCESS("Sync Completed."))
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Sync Failed: {e}"))

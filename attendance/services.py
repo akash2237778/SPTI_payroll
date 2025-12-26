@@ -8,21 +8,35 @@ import time
 logger = logging.getLogger(__name__)
 
 class BiometricService:
-    def sync_device(self, ip, port=4370, max_retries=3):
+    def sync_device(self, ip=None, port=None, max_retries=3):
         """
         Sync with ZK biometric device with retry logic
         
         Args:
-            ip: Device IP address
-            port: Device port (default 4370)
+            ip: Device IP address (optional, uses DeviceSettings if not provided)
+            port: Device port (optional, uses DeviceSettings if not provided)
             max_retries: Maximum number of retry attempts
         """
+        from .models import DeviceSettings
+        
+        # Get device settings from database
+        device_settings = DeviceSettings.get_settings()
+        
+        # Use provided values or fall back to database settings
+        ip = ip or device_settings.device_ip
+        port = port or device_settings.device_port
+        timeout = device_settings.timeout
+        password = device_settings.password
+        force_udp = device_settings.force_udp
+        ommit_ping = device_settings.ommit_ping
+        
         for attempt in range(max_retries):
-            zk = ZK(ip, port=port, timeout=60, password=0, force_udp=False, ommit_ping=True)
+            zk = ZK(ip, port=port, timeout=timeout, password=password, 
+                   force_udp=force_udp, ommit_ping=ommit_ping)
             conn = None
             
             try:
-                logger.info(f"Connecting to device at {ip}... (Attempt {attempt + 1}/{max_retries})")
+                logger.info(f"Connecting to device at {ip}:{port}... (Attempt {attempt + 1}/{max_retries})")
                 conn = zk.connect()
                 
                 # Disable device to prevent interference during sync

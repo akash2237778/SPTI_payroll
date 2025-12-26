@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Shift, Employee, AttendanceLog, DailySummary, WorkSettings
+from .models import Shift, Employee, AttendanceLog, DailySummary, WorkSettings, DeviceSettings
 
 
 @admin.register(Shift)
@@ -80,3 +80,27 @@ class WorkSettingsAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         # Don't allow deletion of WorkSettings
         return False
+
+
+@admin.register(DeviceSettings)
+class DeviceSettingsAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ('Connection Settings', {
+            'fields': ('device_ip', 'device_port', 'timeout'),
+            'description': 'Configure the biometric device connection parameters'
+        }),
+        ('Advanced Settings', {
+            'fields': ('password', 'force_udp', 'ommit_ping'),
+            'classes': ('collapse',),
+            'description': 'Advanced connection options (modify only if needed)'
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        # Only allow one DeviceSettings instance
+        return not DeviceSettings.objects.exists()
+    
+    def has_delete_permission(self, request, obj=None):
+        # Don't allow deletion of DeviceSettings
+        return False
+
