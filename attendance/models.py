@@ -166,6 +166,36 @@ class DeviceSettings(models.Model):
         default=True,
         help_text="Skip initial ping check"
     )
+
+    # Sync Schedule Configuration
+    sync_interval_mins = models.IntegerField(
+        default=30,
+        help_text="Standard sync interval in minutes"
+    )
+    morning_start_time = models.TimeField(
+        default='08:45:00',
+        help_text="Morning peak sync start time"
+    )
+    morning_end_time = models.TimeField(
+        default='10:00:00',
+        help_text="Morning peak sync end time"
+    )
+    morning_interval_mins = models.IntegerField(
+        default=5,
+        help_text="Morning peak sync interval in minutes"
+    )
+    evening_start_time = models.TimeField(
+        default='20:00:00',
+        help_text="Evening peak sync start time"
+    )
+    evening_end_time = models.TimeField(
+        default='21:30:00',
+        help_text="Evening peak sync end time"
+    )
+    evening_interval_mins = models.IntegerField(
+        default=5,
+        help_text="Evening peak sync interval in minutes"
+    )
     
     class Meta:
         verbose_name = "Device Settings"

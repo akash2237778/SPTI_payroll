@@ -108,6 +108,10 @@ class DeviceSettingsAdmin(admin.ModelAdmin):
             'fields': ('device_ip', 'device_port', 'timeout'),
             'description': 'Configure the biometric device connection parameters'
         }),
+        ('Sync Schedule', {
+            'fields': ('sync_interval_mins', 'morning_start_time', 'morning_end_time', 'morning_interval_mins', 'evening_start_time', 'evening_end_time', 'evening_interval_mins'),
+            'description': 'Configure automatic sync intervals and peak times'
+        }),
         ('Advanced Settings', {
             'fields': ('password', 'force_udp', 'ommit_ping'),
             'classes': ('collapse',),

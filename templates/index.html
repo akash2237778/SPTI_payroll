@@ -108,6 +108,8 @@
                             <th>Status</th>
                             <th>First In</th>
                             <th>Last Out</th>
+                            <th>OT</th>
+                            <th>All Punches</th>
                             <th>Duration</th>
                         </tr>
                     </thead>
@@ -115,7 +117,8 @@
                         {% for summary in daily_summaries %}
                         <tr>
                             <td style="font-weight: 500; color: white;">
-                                <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                <a href="{% url 'employee_daily_report' summary.employee.id %}"
+                                    style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 0.8rem;">
                                     <div
                                         style="width: 32px; height: 32px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
                                         {{ summary.employee.name|make_list|first }}
@@ -126,7 +129,7 @@
                                             ID:
                                             {{ summary.employee.employee_id }}</div>
                                     </div>
-                                </div>
+                                </a>
                             </td>
                             <td>
                                 {% if summary.is_overtime %}
@@ -136,13 +139,35 @@
                                     style="background: rgba(255,255,255,0.1); color: #fff;">Regular</span>
                                 {% endif %}
                             </td>
-                            <td style="font-family: 'Space Grotesk';">{{ summary.first_check_in|default:"-" }}</td>
-                            <td style="font-family: 'Space Grotesk';">{{ summary.last_check_out|default:"-" }}</td>
+                            <td style="font-family: 'Space Grotesk';">{{ summary.first_check_in|time:'H:i'|default:'-' }}</td>
+                            <td style="font-family: 'Space Grotesk';">{{ summary.last_check_out|time:'H:i'|default:'-' }}</td>
+
+
+
+                            <!-- OT Column -->
+                            <td style="font-family: 'Space Grotesk'; color: #fbbf24;">
+                                {% if summary.overtime_hours > 0 %}
+                                {{ summary.overtime_hours }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+
+                            <!-- All Punches Column -->
+                            <td style="max-width: 200px;">
+                                <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                    {% for p in summary.punches %}
+                                    <span
+                                        style="font-size: 0.7rem; background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 4px; font-family: 'Space Grotesk';">{{ p|time:\'H:i\' }}</span>
+                                    {% endfor %}
+                                </div>
+                            </td>
+
                             <td style="font-family: 'Space Grotesk'; color: #c4b5fd;">{{ summary.total_hours }} hrs</td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                            <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
                                 No active attendance records for today.
                             </td>
                         </tr>
@@ -211,5 +236,48 @@
             }
         });
     });
+
+    // Handle Sync Button
+    const syncBtn = document.getElementById('syncBtn');
+    const syncText = document.getElementById('syncText');
+    const syncSpinner = document.getElementById('syncSpinner');
+
+    if (syncBtn) {
+        syncBtn.addEventListener('click', async () => {
+            if (syncBtn.classList.contains('loading')) return;
+
+            // Set loading state
+            syncBtn.classList.add('loading');
+            syncText.textContent = 'Syncing...';
+            syncSpinner.style.display = 'inline-block';
+
+            try {
+                const response = await fetch('/sync-logs/');
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Success
+                    syncText.textContent = 'Done!';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    // Error
+                    alert('Sync failed: ' + (data.message || 'Unknown error'));
+                    resetBtn();
+                }
+            } catch (error) {
+                console.error('Sync error:', error);
+                alert('Sync failed: Network error');
+                resetBtn();
+            }
+        });
+    }
+
+    function resetBtn() {
+        syncBtn.classList.remove('loading');
+        syncText.textContent = 'Sync Now';
+        syncSpinner.style.display = 'none';
+    }
 </script>
 {% endblock %}

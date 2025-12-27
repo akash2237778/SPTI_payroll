@@ -25,9 +25,20 @@ def index(request):
     last_sync_time = last_log.timestamp if last_log else None
     
     # Data
-    daily_summaries = DailySummary.objects.filter(date=today).select_related('employee')
-    recent_logs = AttendanceLog.objects.select_related('employee').order_by('-timestamp')[:10]
+    daily_summaries = list(DailySummary.objects.filter(date=today).select_related('employee'))
+    recent_logs = AttendanceLog.objects.select_related('employee').order_by('-timestamp')[:50]
     
+    # Attach all punches for today to summaries
+    today_logs = AttendanceLog.objects.filter(timestamp__date=today).order_by('timestamp')
+    punches_map = {}
+    for log in today_logs:
+        if log.employee_id not in punches_map:
+            punches_map[log.employee_id] = []
+        punches_map[log.employee_id].append(log.timestamp)
+        
+    for summary in daily_summaries:
+        summary.punches = punches_map.get(summary.employee.id, [])
+
     context = {
         'total_employees': total_employees,
         'logs_today_count': logs_today_count,
