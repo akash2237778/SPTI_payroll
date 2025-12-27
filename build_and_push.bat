@@ -9,7 +9,7 @@ REM Configuration
 set DOCKER_USERNAME=akash7778
 set IMAGE_BACKEND=sptipayroll-backend
 set IMAGE_CONSUMER=sptipayroll-consumer
-set TAG=0.3
+set TAG=0.5
 
 echo.
 echo [1/4] Building backend image...

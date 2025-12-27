@@ -13,22 +13,24 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #0f172a;
+            /* Dark theme background matching report */
+            color: #e2e8f0;
             min-height: 100vh;
             padding: 20px;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
 
         .header {
-            background: white;
+            background: #1e293b;
             padding: 20px 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
@@ -36,8 +38,9 @@
         }
 
         .header h1 {
-            color: #667eea;
-            font-size: 28px;
+            color: #f8fafc;
+            font-size: 24px;
+            font-weight: 600;
         }
 
         .nav-links {
@@ -45,31 +48,32 @@
             gap: 15px;
         }
 
-        .nav-links a {
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
+        .nav-link {
+            padding: 8px 16px;
+            background: #334155;
+            color: #cbd5e1;
             text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 14px;
         }
 
-        .nav-links a:hover {
-            background: #764ba2;
-            transform: translateY(-2px);
+        .nav-link:hover {
+            background: #475569;
+            color: white;
         }
 
         .filters-card {
-            background: white;
+            background: #1e293b;
             padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
             margin-bottom: 25px;
+            border: 1px solid #334155;
         }
 
         .filters-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -81,23 +85,25 @@
 
         .form-group label {
             margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 500;
         }
 
         .form-group select,
         .form-group input {
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            padding: 10px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: white;
             font-size: 14px;
-            transition: border-color 0.3s;
         }
 
         .form-group select:focus,
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #6366f1;
         }
 
         .button-group {
@@ -107,133 +113,139 @@
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
+            font-weight: 500;
+            transition: all 0.2s;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
-            background: #667eea;
+            background: #6366f1;
             color: white;
         }
 
         .btn-primary:hover {
-            background: #764ba2;
-            transform: translateY(-2px);
-        }
-
-        .btn-success {
-            background: #48bb78;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #38a169;
-        }
-
-        .btn-danger {
-            background: #f56565;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #e53e3e;
+            background: #4f46e5;
         }
 
         .btn-secondary {
-            background: #718096;
+            background: #475569;
             color: white;
         }
 
         .btn-secondary:hover {
-            background: #4a5568;
+            background: #334155;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
         }
 
         .logs-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .logs-table-wrapper {
-            overflow-x: auto;
+            background: #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #334155;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            font-size: 14px;
         }
 
         thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #0f172a;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.05em;
         }
 
         th {
-            padding: 15px;
+            padding: 16px 24px;
             text-align: left;
             font-weight: 600;
+            border-bottom: 1px solid #334155;
         }
 
         td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 16px 24px;
+            border-bottom: 1px solid #334155;
+            color: #e2e8f0;
+            vertical-align: middle;
         }
 
-        tbody tr {
-            transition: background-color 0.2s;
+        tr:last-child td {
+            border-bottom: none;
         }
 
         tbody tr:hover {
-            background-color: #f7fafc;
+            background: #263345;
         }
 
-        .checkbox {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .action-btn {
-            padding: 6px 12px;
-            border: none;
+        .time-chip {
+            display: inline-block;
+            padding: 4px 10px;
             border-radius: 6px;
-            cursor: pointer;
+            background: #312e81;
+            color: #c7d2fe;
             font-size: 12px;
-            transition: all 0.2s;
+            margin: 2px;
+            border: 1px solid #4338ca;
         }
 
-        .edit-btn {
-            background: #4299e1;
+        .time-green {
+            color: #4ade80;
+            font-weight: 500;
+        }
+
+        .time-red {
+            color: #f87171;
+            font-weight: 500;
+        }
+
+        .val-total {
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .val-ot {
+            color: #fbbf24;
+            font-weight: 600;
+            padding: 2px 6px;
+            background: rgba(251, 191, 36, 0.1);
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .edit-day-btn {
+            padding: 6px 12px;
+            background: #3b82f6;
             color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
         }
 
-        .edit-btn:hover {
-            background: #3182ce;
+        .edit-day-btn:hover {
+            background: #2563eb;
         }
 
-        .delete-btn {
-            background: #f56565;
-            color: white;
-        }
-
-        .delete-btn:hover {
-            background: #e53e3e;
-        }
-
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -242,112 +254,112 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
         }
 
         .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: slideIn 0.3s;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-header {
-            margin-bottom: 20px;
-        }
-
-        .modal-header h2 {
-            color: #667eea;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 20px;
-        }
-
-        .close:hover {
-            color: #000;
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            animation: slideDown 0.3s;
+            background-color: #1e293b;
+            margin: 5% auto;
+            border-radius: 12px;
+            width: 600px;
+            border: 1px solid #334155;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideDown 0.3s ease-out;
         }
 
         @keyframes slideDown {
             from {
-                transform: translateY(-20px);
                 opacity: 0;
+                transform: translateY(-20px);
             }
 
             to {
-                transform: translateY(0);
                 opacity: 1;
+                transform: translateY(0);
             }
         }
 
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+            color: #f8fafc;
+        }
+
+        .close-modal {
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .close-modal:hover {
+            color: white;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .punch-list {
+            margin-top: 20px;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .punch-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #0f172a;
+            border-bottom: 1px solid #334155;
+        }
+
+        .punch-item:last-child {
+            border-bottom: none;
+        }
+
+        .punch-time {
+            font-family: monospace;
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        .punch-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
         .alert-success {
-            background-color: #c6f6d5;
-            color: #22543d;
-            border-left: 4px solid #48bb78;
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .alert-error {
-            background-color: #fed7d7;
-            color: #742a2a;
-            border-left: 4px solid #f56565;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: #718096;
-            font-size: 16px;
-        }
-
-        .badge {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-info {
-            background: #bee3f8;
-            color: #2c5282;
+            background: rgba(244, 63, 94, 0.2);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.3);
         }
     </style>
 </head>
@@ -357,15 +369,15 @@
         <div class="header">
             <h1>📋 Manage Attendance Logs</h1>
             <div class="nav-links">
-                <a href="/">Dashboard</a>
-                <a href="/monthly-report/">Monthly Report</a>
+                <a href="/" class="nav-link">Dashboard</a>
+                <a href="/monthly-report/" class="nav-link">Monthly Report</a>
             </div>
         </div>
 
         <div id="alertContainer"></div>
 
         <div class="filters-card">
-            <h3 style="margin-bottom: 20px; color: #333;">🔍 Filter & Search</h3>
+            <h3 style="margin-bottom: 20px; color: #f8fafc; font-size: 16px;">🔍 Filter & Search</h3>
             <form method="GET" action="">
                 <div class="filters-grid">
                     <div class="form-group">
@@ -390,128 +402,158 @@
                 </div>
                 <div class="button-group">
                     <button type="submit" class="btn btn-primary">Apply Filters</button>
-                    <a href="/attendance-logs/" class="btn btn-secondary">Clear Filters</a>
-                    <button type="button" class="btn btn-success" onclick="openAddModal()">➕ Add New Log</button>
-                    <button type="button" class="btn btn-danger" onclick="bulkDelete()" id="bulkDeleteBtn"
-                        style="display: none;">🗑️ Delete Selected</button>
+                    <a href="/attendance-logs/" class="btn btn-secondary">Clear</a>
+                    <button type="button" class="btn btn-success" onclick="openAddModal()">➕ Log New Punch</button>
                 </div>
             </form>
         </div>
 
         <div class="logs-card">
-            <h3 style="margin-bottom: 15px; color: #333;">
-                Attendance Logs
-                <span class="badge badge-info">{{ logs|length }} records</span>
-            </h3>
+            {% if summary_data %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Employee</th>
+                        <th>First Check-In</th>
+                        <th>Last Check-Out</th>
+                        <th>Total Hours</th>
+                        <th>Overtime</th>
+                        <th>All Punches</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in summary_data %}
+                    <tr>
+                        <td style="color: #94a3b8;">{{ item.summary.date|date:"D, M d, Y" }}</td>
+                        <td><strong>{{ item.summary.employee.name }}</strong></td>
 
-            {% if logs %}
-            <div class="logs-table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th><input type="checkbox" class="checkbox" id="selectAll" onchange="toggleSelectAll(this)">
-                            </th>
-                            <th>Employee</th>
-                            <th>Date & Time</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for log in logs %}
-                        <tr>
-                            <td><input type="checkbox" class="checkbox log-checkbox" value="{{ log.id }}"></td>
-                            <td><strong>{{ log.employee.name }}</strong></td>
-                            <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
-                            <td><span class="badge badge-info">Check-in</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="action-btn edit-btn"
-                                        onclick="openEditModal({{ log.id }}, '{{ log.employee.id }}', '{{ log.timestamp|date:"
-                                        Y-m-d\TH:i" }}')">
-                                        ✏️ Edit
-                                    </button>
-                                    <button class="action-btn delete-btn"
-                                        onclick="deleteLog({{ log.id }}, '{{ log.employee.name }}')">
-                                        🗑️ Delete
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                        <td class="time-green">
+                            {% if item.summary.first_check_in %}
+                            {{ item.summary.first_check_in|time:"g:i a" }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+
+                        <td class="time-red">
+                            {% if item.summary.last_check_out %}
+                            {{ item.summary.last_check_out|time:"g:i a" }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+
+                        <td class="val-total">
+                            {{ item.summary.total_hours }} hrs
+                            {% if item.summary.is_overtime %}
+                            <span style="font-size: 10px; color: #fbbf24; margin-left:5px;">OT</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if item.summary.overtime_hours > 0 %}
+                            <span class="val-ot">{{ item.summary.overtime_hours }} hrs</span>
+                            {% else %}
+                            <span style="color: #64748b;">-</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% for log in item.logs %}
+                            <span class="time-chip" title="{{ log.timestamp }}">{{ log.timestamp|date:"H:i:s" }}</span>
+                            {% endfor %}
+                        </td>
+
+                        <td>
+                            <button class="edit-day-btn"
+                                onclick="openDayEditor('{{ item.summary.employee.id }}', '{{ item.summary.date|date:'Y-m-d' }}', '{{ item.summary.employee.name }}')">
+                                ✏️ Edit
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             {% else %}
-            <div class="no-data">
-                <p>📭 No attendance logs found</p>
-                <p style="margin-top: 10px; font-size: 14px;">Try adjusting your filters or add a new log</p>
+            <div style="padding: 50px; text-align: center; color: #64748b;">
+                <p>No attendance records found for this period.</p>
             </div>
             {% endif %}
         </div>
     </div>
 
-    <!-- Add Log Modal -->
+    <!-- Add Single Log Modal -->
     <div id="addModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span class="close" onclick="closeAddModal()">&times;</span>
-                <h2>➕ Add Attendance Log</h2>
+                <h2>➕ Add New Punch</h2>
+                <span class="close-modal" onclick="closeAddModal()">&times;</span>
             </div>
-            <form id="addForm">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="add_employee_id">Employee *</label>
-                    <select name="employee_id" id="add_employee_id" required>
-                        <option value="">Select Employee</option>
-                        {% for emp in employees %}
-                        <option value="{{ emp.id }}">{{ emp.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="add_timestamp">Date & Time *</label>
-                    <input type="datetime-local" name="timestamp" id="add_timestamp" required>
-                </div>
-                <div class="button-group" style="margin-top: 20px;">
-                    <button type="submit" class="btn btn-success">Add Log</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
-                </div>
-            </form>
+            <div class="modal-body">
+                <form id="addForm">
+                    {% csrf_token %}
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="add_employee_id">Employee *</label>
+                        <select name="employee_id" id="add_employee_id" required>
+                            <option value="">Select Employee</option>
+                            {% for emp in employees %}
+                            <option value="{{ emp.id }}">{{ emp.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="add_timestamp">Date & Time *</label>
+                        <input type="datetime-local" name="timestamp" id="add_timestamp" required>
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-success">Save Punch</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <!-- Edit Log Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
+    <!-- Day Editor Modal -->
+    <div id="dayEditorModal" class="modal">
+        <div class="modal-content" style="width: 500px;">
             <div class="modal-header">
-                <span class="close" onclick="closeEditModal()">&times;</span>
-                <h2>✏️ Edit Attendance Log</h2>
+                <h2 id="editorTitle">Edit Punches</h2>
+                <span class="close-modal" onclick="closeDayEditor()">&times;</span>
             </div>
-            <form id="editForm">
-                {% csrf_token %}
-                <input type="hidden" id="edit_log_id">
-                <div class="form-group">
-                    <label for="edit_employee_id">Employee</label>
-                    <select name="employee_id" id="edit_employee_id" disabled>
-                        {% for emp in employees %}
-                        <option value="{{ emp.id }}">{{ emp.name }}</option>
-                        {% endfor %}
-                    </select>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <h3 id="editorSubtitle" style="font-size: 14px; color: #94a3b8; font-weight: normal;"></h3>
                 </div>
-                <div class="form-group">
-                    <label for="edit_timestamp">Date & Time *</label>
-                    <input type="datetime-local" name="timestamp" id="edit_timestamp" required>
+
+                <!-- Add new punch for this day -->
+                <form id="dayAddForm" style="display: flex; gap: 10px; margin-bottom: 20px; align-items: flex-end;">
+                    <input type="hidden" id="day_employee_id">
+                    <input type="hidden" id="day_date"> <!-- YYYY-MM-DD -->
+
+                    <div class="form-group" style="flex: 1;">
+                        <label>Time</label>
+                        <input type="time" id="day_new_time" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm" style="height: 42px;">+ Add</button>
+                </form>
+
+                <div style="max-height: 300px; overflow-y: auto;">
+                    <label style="color: #94a3b8; font-size: 12px; display: block; margin-bottom: 8px;">EXISTING
+                        PUNCHES</label>
+                    <div id="punchListContainer" class="punch-list">
+                        <!-- Filled by JS -->
+                        <div style="padding: 20px; text-align: center; color: #64748b;">Loading...</div>
+                    </div>
                 </div>
-                <div class="button-group" style="margin-top: 20px;">
-                    <button type="submit" class="btn btn-primary">Update Log</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
     <script>
+        // --- Utilities ---
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -528,174 +570,156 @@
         }
 
         function showAlert(message, type) {
-            const alertContainer = document.getElementById('alertContainer');
+            const container = document.getElementById('alertContainer');
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
             alert.textContent = message;
-            alertContainer.appendChild(alert);
-
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
         }
 
+        // --- Add Modal ---
         function openAddModal() {
             document.getElementById('addModal').style.display = 'block';
-            document.getElementById('add_timestamp').value = new Date().toISOString().slice(0, 16);
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('add_timestamp').value = now.toISOString().slice(0, 16);
         }
 
         function closeAddModal() {
             document.getElementById('addModal').style.display = 'none';
-            document.getElementById('addForm').reset();
-        }
-
-        function openEditModal(logId, employeeId, timestamp) {
-            document.getElementById('editModal').style.display = 'block';
-            document.getElementById('edit_log_id').value = logId;
-            document.getElementById('edit_employee_id').value = employeeId;
-            document.getElementById('edit_timestamp').value = timestamp;
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-            document.getElementById('editForm').reset();
         }
 
         document.getElementById('addForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             const formData = new FormData(this);
-
             try {
-                const response = await fetch('/api/attendance-log/add/', {
+                const res = await fetch('/api/attendance-log/add/', {
                     method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
                     body: formData
                 });
-
-                const data = await response.json();
-
+                const data = await res.json();
                 if (data.status === 'success') {
-                    showAlert(data.message, 'success');
+                    showAlert('Punch added successfully', 'success');
                     closeAddModal();
-                    setTimeout(() => location.reload(), 1000);
+                    setTimeout(() => location.reload(), 800);
                 } else {
                     showAlert(data.message, 'error');
                 }
-            } catch (error) {
-                showAlert('Error adding log: ' + error.message, 'error');
+            } catch (err) {
+                showAlert(err.message, 'error');
             }
         });
 
-        document.getElementById('editForm').addEventListener('submit', async function (e) {
+        // --- Day Editor Modal ---
+        let currentPunches = []; // Store punches locally
+
+        async function openDayEditor(employeeId, dateStr, employeeName) {
+            document.getElementById('dayEditorModal').style.display = 'block';
+            document.getElementById('editorTitle').textContent = `Edit Punches for ${employeeName}`;
+            document.getElementById('editorSubtitle').textContent = `Date: ${dateStr}`;
+            document.getElementById('day_employee_id').value = employeeId;
+            document.getElementById('day_date').value = dateStr;
+            document.getElementById('punchListContainer').innerHTML = '<div style="padding: 20px; text-align: center; color: #64748b;">Loading...</div>';
+
+            // Fetch logs for this day from embedded JS data
+            renderPunches(employeeId, dateStr);
+        }
+
+        // We need the data accessible in JS.
+        const allLogData = {
+            {% for item in summary_data %}
+        "{{ item.summary.employee.id }}_{{ item.summary.date|date:'Y-m-d' }}": [
+            {% for log in item.logs %}
+        { id: {{ log.id }}, time: "{{ log.timestamp|date:'H:i:s' }}" },
+        {% endfor %}
+            ],
+        {% endfor %}
+        };
+
+        function renderPunches(empId, dateStr) {
+            const key = `${empId}_${dateStr}`;
+            const punches = allLogData[key] || [];
+            currentPunches = punches; // keep ref
+
+            const container = document.getElementById('punchListContainer');
+            container.innerHTML = '';
+
+            if (punches.length === 0) {
+                container.innerHTML = '<div style="padding: 15px; text-align: center; font-size: 13px; color: #64748b;">No punches recorded</div>';
+                return;
+            }
+
+            punches.forEach(log => {
+                const div = document.createElement('div');
+                div.className = 'punch-item';
+                div.innerHTML = `
+                    <span class="punch-time">🕒 ${log.time}</span>
+                    <div class="punch-actions">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="deletePunch(${log.id}, '${empId}', '${dateStr}')">Delete</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function deletePunch(logId, empId, dateStr) {
+            if (!confirm('Delete this punch?')) return;
+
+            try {
+                const res = await fetch(`/api/attendance-log/${logId}/delete/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') }
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+
+        // Add punch to specific day
+        document.getElementById('dayAddForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-            const logId = document.getElementById('edit_log_id').value;
-            const formData = new FormData(this);
+            const empId = document.getElementById('day_employee_id').value;
+            const dateStr = document.getElementById('day_date').value;
+            const timeStr = document.getElementById('day_new_time').value; // HH:MM
 
-            try {
-                const response = await fetch(`/api/attendance-log/${logId}/edit/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: formData
-                });
+            if (!timeStr) return;
 
-                const data = await response.json();
-
-                if (data.status === 'success') {
-                    showAlert(data.message, 'success');
-                    closeEditModal();
-                    setTimeout(() => location.reload(), 1000);
-                } else {
-                    showAlert(data.message, 'error');
-                }
-            } catch (error) {
-                showAlert('Error updating log: ' + error.message, 'error');
-            }
-        });
-
-        async function deleteLog(logId, employeeName) {
-            if (!confirm(`Are you sure you want to delete this attendance log for ${employeeName}?`)) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/attendance-log/${logId}/delete/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                });
-
-                const data = await response.json();
-
-                if (data.status === 'success') {
-                    showAlert(data.message, 'success');
-                    setTimeout(() => location.reload(), 1000);
-                } else {
-                    showAlert(data.message, 'error');
-                }
-            } catch (error) {
-                showAlert('Error deleting log: ' + error.message, 'error');
-            }
-        }
-
-        function toggleSelectAll(checkbox) {
-            const checkboxes = document.querySelectorAll('.log-checkbox');
-            checkboxes.forEach(cb => cb.checked = checkbox.checked);
-            updateBulkDeleteButton();
-        }
-
-        document.querySelectorAll('.log-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', updateBulkDeleteButton);
-        });
-
-        function updateBulkDeleteButton() {
-            const checkedBoxes = document.querySelectorAll('.log-checkbox:checked');
-            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
-            bulkDeleteBtn.style.display = checkedBoxes.length > 0 ? 'inline-block' : 'none';
-        }
-
-        async function bulkDelete() {
-            const checkedBoxes = document.querySelectorAll('.log-checkbox:checked');
-            const logIds = Array.from(checkedBoxes).map(cb => cb.value);
-
-            if (!confirm(`Are you sure you want to delete ${logIds.length} attendance log(s)?`)) {
-                return;
-            }
-
+            const fullIso = `${dateStr}T${timeStr}`;
             const formData = new FormData();
-            logIds.forEach(id => formData.append('log_ids[]', id));
+            formData.append('employee_id', empId);
+            formData.append('timestamp', fullIso);
 
             try {
-                const response = await fetch('/api/attendance-logs/bulk-delete/', {
+                const res = await fetch('/api/attendance-log/add/', {
                     method: 'POST',
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
                     body: formData
                 });
-
-                const data = await response.json();
-
+                const data = await res.json();
                 if (data.status === 'success') {
-                    showAlert(data.message, 'success');
-                    setTimeout(() => location.reload(), 1000);
+                    location.reload();
                 } else {
-                    showAlert(data.message, 'error');
+                    alert(data.message);
                 }
-            } catch (error) {
-                showAlert('Error deleting logs: ' + error.message, 'error');
+            } catch (err) {
+                alert(err.message);
             }
+        });
+
+        function closeDayEditor() {
+            document.getElementById('dayEditorModal').style.display = 'none';
         }
 
-        // Close modals when clicking outside
-        window.onclick = function (event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
+        window.onclick = function (e) {
+            if (e.target.classList.contains('modal')) e.target.style.display = 'none';
         }
     </script>
 </body>

@@ -43,9 +43,30 @@ h3,
 /* Layout */
 .dashboard-grid {
     display: grid;
-    /* Use minmax(0, 1fr) to prevent overflow from children (like tables) */
     grid-template-columns: 280px minmax(0, 1fr);
     min-height: 100vh;
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
+    padding: 0.75rem;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sidebar {
@@ -58,6 +79,7 @@ h3,
     height: 100vh;
     display: flex;
     flex-direction: column;
+    transition: transform 0.3s ease;
 }
 
 .main-content {
@@ -148,6 +170,8 @@ h3,
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .btn-glow {
@@ -212,6 +236,8 @@ h3,
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .table-title {
@@ -220,10 +246,16 @@ h3,
     margin: 0;
 }
 
+.table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
+    min-width: 600px;
 }
 
 th {
@@ -235,6 +267,7 @@ th {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    white-space: nowrap;
 }
 
 td {
@@ -259,6 +292,7 @@ tr:hover td {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
+    white-space: nowrap;
 }
 
 .status-in {
@@ -291,17 +325,193 @@ tr:hover td {
     }
 }
 
+/* Toast Notifications */
+.success-toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--accent-success);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(200%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+.success-toast.show {
+    transform: translateY(0);
+}
+
+/* Mobile Responsive Styles */
 @media (max-width: 1024px) {
     .dashboard-grid {
         grid-template-columns: 1fr;
     }
 
+    .mobile-menu-toggle {
+        display: flex;
+    }
+
     .sidebar {
-        display: none;
-        /* Hide sidebar on mobile for now or make it a top bar */
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 999;
+        transform: translateX(-100%);
+        width: 280px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
     }
 
     .main-content {
-        padding: 1.5rem;
+        padding: 5rem 1.5rem 1.5rem;
+    }
+
+    .sync-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sync-section>div {
+        width: 100%;
+    }
+
+    .btn-glow {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .stats-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .glass-card {
+        padding: 1.25rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+    }
+
+    .table-header {
+        padding: 1rem;
+    }
+
+    th,
+    td {
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .card-icon {
+        font-size: 1.5rem;
+        right: 1rem;
+        top: 1rem;
+    }
+
+    .logo {
+        margin-bottom: 2rem;
+    }
+
+    .success-toast {
+        bottom: 1rem;
+        right: 1rem;
+        left: 1rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .main-content {
+        padding: 5rem 1rem 1rem;
+    }
+
+    h1 {
+        font-size: 1.5rem !important;
+    }
+
+    .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .table-title {
+        font-size: 1rem;
+    }
+
+    th,
+    td {
+        padding: 0.75rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
+    .btn-glow {
+        padding: 0.875rem 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.7rem;
+    }
+
+    /* Make tables more mobile-friendly */
+    table {
+        min-width: 500px;
+    }
+
+    .glass-card {
+        border-radius: 16px;
+    }
+
+    .table-wrapper {
+        border-radius: 16px;
+    }
+}
+
+/* Overlay for mobile menu */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 998;
+    backdrop-filter: blur(4px);
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* Improve touch targets on mobile */
+@media (max-width: 1024px) {
+
+    a,
+    button,
+    .clickable {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    nav a div,
+    nav div[style*="cursor: pointer"] {
+        padding: 1rem !important;
     }
 }

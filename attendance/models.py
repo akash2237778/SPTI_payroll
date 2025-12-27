@@ -232,6 +232,21 @@ class AttendanceLog(models.Model):
     timestamp = models.DateTimeField()
     status = models.IntegerField(default=0, help_text="Device Status Code (0=Check-In, 1=Check-Out, etc.)")
     verification_mode = models.IntegerField(default=1, help_text="Verification Mode")
+    is_manually_edited = models.BooleanField(
+        default=False,
+        help_text="If True, this log was manually edited and should not be overridden by sync"
+    )
+    edited_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when this log was last manually edited"
+    )
+    edited_by = models.CharField(
+        max_length=150,
+        null=True,
+        blank=True,
+        help_text="Username of the person who edited this log"
+    )
 
     class Meta:
         unique_together = ('employee', 'timestamp')

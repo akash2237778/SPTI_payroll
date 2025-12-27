@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 
 def manage_attendance_logs(request):
     """
-    View to manage attendance logs - list, search, filter
+    View to manage attendance logs - list, search, filter.
+    Displays Daily Summaries with grouped logs, mimicking the report view.
     """
     import datetime
     
@@ -25,35 +26,75 @@ def manage_attendance_logs(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     
-    # Base query
-    logs = AttendanceLog.objects.select_related('employee').order_by('-timestamp')
+    # Default to current month if no dates provided
+    if not start_date and not end_date:
+        today = datetime.date.today()
+        start_date = today.replace(day=1).strftime('%Y-%m-%d')
+        end_date = today.strftime('%Y-%m-%d')
+
+    # Base query for Summaries
+    summaries = DailySummary.objects.select_related('employee').order_by('-date', 'employee__name')
     
     # Apply filters
     if employee_id:
-        logs = logs.filter(employee_id=employee_id)
+        summaries = summaries.filter(employee_id=employee_id)
     
     if start_date:
         try:
             start = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
-            logs = logs.filter(timestamp__date__gte=start)
+            summaries = summaries.filter(date__gte=start)
         except ValueError:
             pass
     
     if end_date:
         try:
             end = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
-            logs = logs.filter(timestamp__date__lte=end)
+            summaries = summaries.filter(date__lte=end)
         except ValueError:
             pass
     
-    # Limit to recent 100 logs for performance
-    logs = logs[:100]
+    # Limit number of records if no specific filters to avoid overload
+    if not employee_id and not start_date:
+        summaries = summaries[:50]
+        
+    # Fetch related logs for these summaries to display "All Punches"
+    # We need a map: (employee_id, date) -> [logs]
     
+    # Get the date range and employee scope from the filtered summaries
+    # (Optimized approach: Fetch logs only for the displayed summaries)
+    # Since 'summaries' is a queryset, we can't easily iterate before slicing if we sliced.
+    # But usually this view is paginated. For now, let's just fetch logs for the date range.
+    
+    # If we have a huge range, this might be heavy. Let's rely on the applied filters.
+    logs_query = AttendanceLog.objects.select_related('employee').order_by('timestamp')
+    if employee_id:
+        logs_query = logs_query.filter(employee_id=employee_id)
+    if start_date:
+        logs_query = logs_query.filter(timestamp__date__gte=start_date)
+    if end_date:
+        logs_query = logs_query.filter(timestamp__date__lte=end_date)
+        
+    logs_by_key = {}
+    for log in logs_query:
+        key = (log.employee.id, log.timestamp.date())
+        if key not in logs_by_key:
+            logs_by_key[key] = []
+        logs_by_key[key].append(log)
+
+    # Attach logs to summaries for template access
+    summary_data = []
+    for s in summaries:
+        key = (s.employee.id, s.date)
+        summary_data.append({
+            'summary': s,
+            'logs': logs_by_key.get(key, [])
+        })
+
     # Get all employees for dropdown
     employees = Employee.objects.all().order_by('name')
     
     context = {
-        'logs': logs,
+        'summary_data': summary_data,
         'employees': employees,
         'selected_employee_id': int(employee_id) if employee_id else None,
         'start_date': start_date,

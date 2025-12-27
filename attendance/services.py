@@ -160,13 +160,26 @@ class BiometricService:
             logger.info(f"Processing batch from {min_ts} to {max_ts}")
 
             # 2. Optimization: Identify existing LOGS to avoid duplicates
-            existing_logs = set(
-                AttendanceLog.objects.filter(
-                    timestamp__range=(min_ts, max_ts)
-                ).values_list('employee_id', 'timestamp')
+            # IMPORTANT: Exclude manually edited logs from being overridden
+            existing_logs_query = AttendanceLog.objects.filter(
+                timestamp__range=(min_ts, max_ts)
             )
+            
+            # Get all existing logs (including manually edited ones)
+            existing_logs = set(
+                existing_logs_query.values_list('employee_id', 'timestamp')
+            )
+            
+            # Get manually edited logs separately to log them
+            manually_edited_logs = set(
+                existing_logs_query.filter(is_manually_edited=True).values_list('employee_id', 'timestamp')
+            )
+            
+            if manually_edited_logs:
+                logger.info(f"Found {len(manually_edited_logs)} manually edited logs - these will be preserved")
         else:
             existing_logs = set()
+            manually_edited_logs = set()
 
         # 3. Create list of new AttendanceLog objects
         new_logs = []
@@ -263,157 +276,190 @@ class BiometricService:
             if not all_logs.exists():
                 continue
             
-            # Group logs by detected shift
+            # Group logs by detected shift - RETURNS LIST OF SESSIONS per key
             shift_groups = self._group_logs_by_shift(employee, all_logs)
             
-            # Process each shift group
-            for (shift, shift_date), logs in shift_groups.items():
-                if not logs or len(logs) < 1:
+            # Process each shift group (which may contain multiple disjoint sessions)
+            for (shift, shift_date), sessions in shift_groups.items():
+                if not sessions:
                     continue
                 
-                first_in = logs[0].timestamp
-                last_out = logs[-1].timestamp
+                # Global Day Stats
+                day_total_time = 0.0
+                day_night_hours = 0.0
+                day_day_hours = 0.0
+                day_night_allowance = 0.0
                 
-                # Calculate raw working hours
-                if len(logs) > 1:
-                    total_seconds = (last_out - first_in).total_seconds()
-                    total_time = total_seconds / 3600.0
-                else:
-                    total_time = 0.0
+                # Determine overall First In / Last Out for the day
+                # Sessions are chronological
+                first_in_log = sessions[0][0]
+                last_out_log = sessions[-1][-1]
                 
-                # Calculate night vs day hours
-                night_hours, day_hours = calculate_night_hours(
-                    first_in,
-                    last_out,
-                    settings.night_start_time,
-                    settings.night_end_time
-                )
+                # If we have only ONE log in ONE session, last_out is None (active)
+                # But if we have multiple sessions, the last session might be incomplete
+                # Current Logic: If last session has 1 log, last_out is that log (semantically incomplete)
+                # But for UI 'Last Check-Out' column, we usually want the very last timestamp
+                # UNLESS it's a check-in.
+                # Let's keep existing logic: Display the timestamp. Status tells if In/Out.
                 
-                # Subtract break time
-                break_hours = 0.0
-                if shift and shift.exclude_break and shift.break_start_time and shift.break_end_time:
-                    # Use shift-specific break
-                    break_hours = calculate_break_overlap(
-                        first_in,
-                        last_out,
-                        shift.break_start_time,
-                        shift.break_end_time
+                # Calculate metrics for EACH session and sum them
+                for logs in sessions:
+                    if not logs or len(logs) < 1:
+                        continue
+                    
+                    # Single session start/end
+                    s_first = logs[0].timestamp
+                    s_last = logs[-1].timestamp
+                    
+                    if len(logs) == 1:
+                        # Single punch session -> 0 duration
+                        continue
+                    
+                    # Raw session duration
+                    s_duration = (s_last - s_first).total_seconds() / 3600.0
+                    
+                    # Calculate night/day split for this session
+                    s_night, s_day = calculate_night_hours(
+                        s_first,
+                        s_last,
+                        settings.night_start_time,
+                        settings.night_end_time
                     )
-                elif settings.exclude_lunch_from_hours:
-                    # Use global lunch break
-                    break_hours = calculate_break_overlap(
-                        first_in,
-                        last_out,
-                        settings.lunch_start_time,
-                        settings.lunch_end_time
-                    )
+                    
+                    # Calculate break overlap for this session
+                    break_hours = 0.0
+                    if shift and shift.exclude_break and shift.break_start_time and shift.break_end_time:
+                         break_hours = calculate_break_overlap(
+                            s_first,
+                            s_last,
+                            shift.break_start_time,
+                            shift.break_end_time
+                        )
+                    elif settings.exclude_lunch_from_hours:
+                        break_hours = calculate_break_overlap(
+                            s_first,
+                            s_last,
+                            settings.lunch_start_time,
+                            settings.lunch_end_time
+                        )
+                    
+                    # Deduct break
+                    if break_hours > 0:
+                        s_duration -= break_hours
+                        # Reduce night/day proportionally
+                        if s_duration + break_hours > 0:
+                            ratio = s_duration / (s_duration + break_hours)
+                            s_night *= ratio
+                            s_day *= ratio
+                    
+                    # Accumulate
+                    day_total_time += max(0.0, s_duration)
+                    day_night_hours += max(0.0, s_night)
+                    day_day_hours += max(0.0, s_day)
+                    
+                    # Night allowance (per session or total? Usually total night hours.
+                    # But simpler to accumulate hours here and calc allowance at end)
                 
-                if break_hours > 0:
-                    total_time -= break_hours
-                    # Proportionally reduce night/day hours
-                    if total_time + break_hours > 0:
-                        ratio = total_time / (total_time + break_hours)
-                        night_hours *= ratio
-                        day_hours *= ratio
-                    logger.debug(f"Excluded {break_hours:.2f}h break for {employee.name} on {shift_date}")
                 
-                # Get expected working hours
+                # Calculate Night Allowance on total night hours
+                if shift and shift.night_shift_allowance > 0 and day_night_hours > 0:
+                    day_night_allowance = (day_night_hours * float(shift.night_shift_allowance)) / 100.0
+                
+                # Expected Hours
                 if shift:
                     expected_hours = float(shift.working_hours)
                 else:
                     expected_hours = employee.get_working_hours()
                 
-                # Calculate overtime
-                overtime = max(0.0, total_time - expected_hours)
+                # Overtime
+                overtime = max(0.0, day_total_time - expected_hours)
                 is_overtime = overtime > 0
                 
-                # Calculate night shift allowance
-                night_allowance_amount = 0.0
-                if shift and shift.night_shift_allowance > 0 and night_hours > 0:
-                    # Allowance is percentage of night hours
-                    night_allowance_amount = (night_hours * float(shift.night_shift_allowance)) / 100.0
-                
-                # Update or create summary
+                # Determine Last Out for UI
+                # If only 1 log total, None.
+                # If multiple logs, use last log time.
+                total_logs_count = sum(len(s) for s in sessions)
+                last_out_val = last_out_log.timestamp.time() if total_logs_count > 1 else None
+
                 DailySummary.objects.update_or_create(
                     employee_id=emp_id,
                     date=shift_date,
                     shift=shift,
                     defaults={
-                        'first_check_in': first_in.time(),
-                        'last_check_out': last_out.time(),  # Always set last checkout
-                        'total_hours': round(total_time, 2),
-                        'night_hours': round(night_hours, 2),
-                        'day_hours': round(day_hours, 2),
+                        'first_check_in': first_in_log.timestamp.time(),
+                        'last_check_out': last_out_val,
+                        'total_hours': round(day_total_time, 2),
+                        'night_hours': round(day_night_hours, 2),
+                        'day_hours': round(day_day_hours, 2),
                         'overtime_hours': round(overtime, 2),
                         'is_overtime': is_overtime,
-                        'night_shift_allowance_amount': round(night_allowance_amount, 2)
+                        'night_shift_allowance_amount': round(day_night_allowance, 2)
                     }
                 )
                 
-                logger.info(
-                    f"Updated summary for {employee.name} on {shift_date}: "
-                    f"{total_time:.2f}h total ({night_hours:.2f}h night, {day_hours:.2f}h day), "
-                    f"{overtime:.2f}h OT, Shift: {shift.name if shift else 'None'}"
+                logger.debug(
+                    f"Updated {employee.name} {shift_date}: {day_total_time:.2f}h ({len(sessions)} sessions)"
                 )
-    
-    
+
     def _group_logs_by_shift(self, employee, logs):
         """
-        Group attendance logs by detected shift and work session
-        
-        For extended shifts that cross midnight, we need to ensure all logs
-        from a single work session (check-in to check-out) are grouped together
-        using the check-in time to determine the shift date.
-        
-        Returns:
-            dict: {(shift, shift_date): [logs]}
+        Group attendance logs using strict alternating logic:
+        1. Debounce: Drop logs within 5 mins of previous log.
+        2. Pair: 1st=IN, 2nd=OUT, 3rd=IN...
+        3. Safety: If a pair exceeds 12 hours, split it into two singleton sessions.
         """
         from .shift_utils import detect_shift_for_attendance
         
         if not logs:
             return {}
+
+        # 1. Debounce Logs
+        sorted_logs = sorted(list(logs), key=lambda x: x.timestamp)
+        clean_logs = []
+        if sorted_logs:
+            last_ts = None
+            for log in sorted_logs:
+                if last_ts:
+                    diff_seconds = (log.timestamp - last_ts).total_seconds()
+                    if diff_seconds < 300:  # 5 minutes
+                        continue
+                clean_logs.append(log)
+                last_ts = log.timestamp
         
-        shift_groups = {}
+        # 2. Form Pairs (Sessions) with Intelligent Alignment
+        raw_sessions = []
+        i = 0
+        n = len(clean_logs)
         
-        # Group logs into work sessions (pairs of check-in/check-out)
-        # A work session starts with a check-in and includes all subsequent logs
-        # until we see another check-in (which starts a new session)
-        
-        work_sessions = []
-        current_session = []
-        
-        for log in logs:
-            if not current_session:
-                # Start new session
-                current_session = [log]
-            else:
-                # Add to current session
-                current_session.append(log)
+        while i < n:
+            current_log = clean_logs[i]
+            next_log = clean_logs[i+1] if (i + 1) < n else None
+            
+            if next_log:
+                # Calculate gap to see if these two form a valid session
+                gap_hours = (next_log.timestamp - current_log.timestamp).total_seconds() / 3600.0
                 
-                # Check if this might be the end of a session
-                # If we have at least 2 logs and the time gap to next log is > 4 hours,
-                # or if this is the last log, close the session
-                log_index = list(logs).index(log)
-                if log_index < len(logs) - 1:
-                    next_log = logs[log_index + 1]
-                    time_gap = (next_log.timestamp - log.timestamp).total_seconds() / 3600.0
-                    if time_gap > 4.0:  # More than 4 hours gap = new session
-                        work_sessions.append(current_session)
-                        current_session = []
+                # If gap is reasonable (< 20h), they are a pair (IN -> OUT)
+                if gap_hours <= 20.0:
+                    raw_sessions.append([current_log, next_log])
+                    i += 2  # Consumed both
                 else:
-                    # Last log - close current session
-                    work_sessions.append(current_session)
-        
-        # If there's an unclosed session, add it
-        if current_session:
-            work_sessions.append(current_session)
-        
-        # Now group each work session by shift using the FIRST log's timestamp
-        for session in work_sessions:
+                    # Gap is too large. Assume current_log is an orphan IN (Missed OUT).
+                    # We treat it as a singleton session.
+                    # We do NOT consume next_log yet; it might be the start of the next valid session.
+                    raw_sessions.append([current_log])
+                    i += 1  # Consumed only current
+            else:
+                # Last log with no partner
+                raw_sessions.append([current_log])
+                i += 1
+
+        # 4. Group by Shift Key
+        shift_groups = {}
+        for session in raw_sessions:
             if not session:
                 continue
             
-            # Use first log (check-in) to determine shift and date
             first_log = session[0]
             shift, shift_date = detect_shift_for_attendance(employee, first_log.timestamp)
             
@@ -421,8 +467,7 @@ class BiometricService:
             if key not in shift_groups:
                 shift_groups[key] = []
             
-            # Add ALL logs from this session to the same shift group
-            shift_groups[key].extend(session)
+            shift_groups[key].append(session)
         
         return shift_groups
 

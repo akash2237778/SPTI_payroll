@@ -40,11 +40,30 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 @admin.register(AttendanceLog)
 class AttendanceLogAdmin(admin.ModelAdmin):
-    list_display = ('employee', 'timestamp', 'status', 'verification_mode')
-    list_filter = ('status', 'timestamp')
+    list_display = ('employee', 'timestamp', 'status', 'verification_mode', 'is_manually_edited', 'edited_by', 'edited_at')
+    list_filter = ('status', 'is_manually_edited', 'timestamp')
     search_fields = ('employee__name', 'employee__employee_id')
     date_hierarchy = 'timestamp'
-    readonly_fields = ('employee', 'timestamp', 'status', 'verification_mode')
+    readonly_fields = ('edited_at', 'edited_by')
+    
+    fieldsets = (
+        ('Attendance Information', {
+            'fields': ('employee', 'timestamp', 'status', 'verification_mode')
+        }),
+        ('Edit Tracking', {
+            'fields': ('is_manually_edited', 'edited_at', 'edited_by'),
+            'description': 'Mark as manually edited to prevent sync from overriding this log'
+        }),
+    )
+    
+    def save_model(self, request, obj, form, change):
+        """Automatically mark log as edited and track who edited it"""
+        if change:  # Only for updates, not new records
+            from django.utils import timezone
+            obj.is_manually_edited = True
+            obj.edited_at = timezone.now()
+            obj.edited_by = request.user.username
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(DailySummary)

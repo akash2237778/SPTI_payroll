@@ -199,6 +199,7 @@ def employee_daily_report(request, employee_id):
             'last_check_out': summary.last_check_out,
             'total_hours': summary.total_hours,
             'is_overtime': summary.is_overtime,
+            'overtime_hours': summary.overtime_hours,
             'logs': logs_by_date.get(summary.date, [])
         })
     

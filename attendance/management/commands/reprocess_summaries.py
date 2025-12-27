@@ -79,11 +79,11 @@ class Command(BaseCommand):
         service = BiometricService()
         service._update_summaries(affected_keys)
         
-        self.stdout.write(self.style.SUCCESS(f"✓ Reprocessed {len(affected_keys)} summaries"))
+        self.stdout.write(self.style.SUCCESS(f"[DONE] Reprocessed {len(affected_keys)} summaries"))
         
         # Show summary
         new_summaries = DailySummary.objects.filter(
             date__gte=from_date,
             date__lte=to_date
         ).count()
-        self.stdout.write(self.style.SUCCESS(f"✓ Total summaries in date range: {new_summaries}"))
+        self.stdout.write(self.style.SUCCESS(f"[DONE] Total summaries in date range: {new_summaries}"))

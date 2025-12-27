@@ -1,0 +1,82 @@
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()">
+    ☰
+</button>
+
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <div class="logo">
+        <div class="logo-icon"></div>
+        <div class="logo-text">SPTI Payroll</div>
+    </div>
+
+    <nav style="display: flex; flex-direction: column; gap: 1rem;">
+        <a href="{% url 'dashboard' %}" style="text-decoration: none;">
+            <div style="padding: 1rem; {% if request.resolver_match.url_name == 'dashboard' %}background: rgba(139, 92, 246, 0.1); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.2);{% else %}color: var(--text-secondary);{% endif %} border-radius: 12px; font-weight: 500; cursor: pointer; transition: 0.3s;"
+                {% if request.resolver_match.url_name !='dashboard' %}onmouseover="this.style.color='white'"
+                onmouseout="this.style.color='#9ca3af'" {% endif %}>
+                📊 Dashboard
+            </div>
+        </a>
+        <a href="{% url 'monthly_report' %}" style="text-decoration: none;">
+            <div style="padding: 1rem; {% if request.resolver_match.url_name == 'monthly_report' %}background: rgba(139, 92, 246, 0.1); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.2);{% else %}color: var(--text-secondary);{% endif %} border-radius: 12px; font-weight: 500; cursor: pointer; transition: 0.3s;"
+                {% if request.resolver_match.url_name !='monthly_report' %}onmouseover="this.style.color='white'"
+                onmouseout="this.style.color='#9ca3af'" {% endif %}>
+                📅 Monthly Report
+            </div>
+        </a>
+        <a href="{% url 'manage_attendance_logs' %}" style="text-decoration: none;">
+            <div style="padding: 1rem; {% if request.resolver_match.url_name == 'manage_attendance_logs' %}background: rgba(139, 92, 246, 0.1); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.2);{% else %}color: var(--text-secondary);{% endif %} border-radius: 12px; font-weight: 500; cursor: pointer; transition: 0.3s;"
+                {% if request.resolver_match.url_name !='manage_attendance_logs'
+                %}onmouseover="this.style.color='white'" onmouseout="this.style.color='#9ca3af'" {% endif %}>
+                📋 Manage Logs
+            </div>
+        </a>
+        <a href="{% url 'shifts' %}" style="text-decoration: none;">
+            <div style="padding: 1rem; {% if request.resolver_match.url_name == 'shifts' %}background: rgba(139, 92, 246, 0.1); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.2);{% else %}color: var(--text-secondary);{% endif %} border-radius: 12px; font-weight: 500; cursor: pointer; transition: 0.3s;"
+                {% if request.resolver_match.url_name=='shifts' %}onmouseover="this.style.color='white'"
+                onmouseout="this.style.color='#9ca3af'" {% endif %}>
+                🕐 Shifts
+            </div>
+        </a>
+        <a href="{% url 'settings' %}" style="text-decoration: none;">
+            <div style="padding: 1rem; {% if request.resolver_match.url_name == 'settings' %}background: rgba(139, 92, 246, 0.1); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.2);{% else %}color: var(--text-secondary);{% endif %} border-radius: 12px; font-weight: 500; cursor: pointer; transition: 0.3s;"
+                {% if request.resolver_match.url_name !='settings' %}onmouseover="this.style.color='white'"
+                onmouseout="this.style.color='#9ca3af'" {% endif %}>
+                ⚙️ Settings
+            </div>
+        </a>
+        <a href="/admin/" style="text-decoration: none;" target="_blank">
+            <div style="padding: 1rem; color: var(--text-secondary); border-radius: 12px; font-weight: 500; cursor: pointer; transition: 0.3s;"
+                onmouseover="this.style.color='white'" onmouseout="this.style.color='#9ca3af'">
+                🔧 Admin Panel
+            </div>
+        </a>
+    </nav>
+
+    <div style="margin-top: auto; padding-top: 2rem; color: var(--text-secondary); font-size: 0.8rem;">
+        <div>System Status: <span style="color: #34d399">● Online</span></div>
+        <div style="margin-top: 0.5rem;">v2.0 Mobile</div>
+    </div>
+</aside>
+
+<script>
+    function toggleMobileMenu() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    // Close menu when clicking on nav links on mobile
+    document.querySelectorAll('.sidebar nav a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 1024) {
+                toggleMobileMenu();
+            }
+        });
+    });
+</script>
